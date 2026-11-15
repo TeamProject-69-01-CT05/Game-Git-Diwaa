@@ -77,15 +77,17 @@ func refresh() -> void:
 	_story_label.visible = not show_checklist
 
 	var current := _mission.current_objective()
-	for objective in _mission.objectives:
-		var done := _mission.is_done(str(objective["id"]))
-		var is_current: bool = not current.is_empty() and str(current["id"]) == str(objective["id"])
-		_rows_box.add_child(_build_row(str(objective.get("short", objective["text"])), done, is_current))
+	if show_checklist:
+		for objective in _mission.objectives:
+			var done := _mission.is_done(str(objective["id"]))
+			var is_current: bool = not current.is_empty() and str(current["id"]) == str(objective["id"])
+			_rows_box.add_child(_build_row(str(objective.get("short", objective["text"])), done, is_current))
 
 	var finished := _mission.is_complete()
 	_hint_button.visible = not finished
 	_hint_label.visible = _hint_visible and not finished
 	_hint_label.text = str(current.get("hint", ""))
+	reset_size()
 
 
 ## แสดงข้อความตอบกลับสั้น ๆ (เช่น เตือนพิมพ์ผิด / ยืนยันว่าทำสำเร็จ) แล้วจางหายเอง
@@ -259,10 +261,12 @@ func _build_row(text: String, done: bool, is_current: bool) -> Control:
 func _on_hint_pressed() -> void:
 	_hint_visible = not _hint_visible
 	refresh()
+	reset_size()
 
 
 func _make_label(font_size: int, color: Color, bold: bool) -> Label:
 	var label := Label.new()
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	label.add_theme_font_size_override("font_size", font_size)
 	label.add_theme_color_override("font_color", color)
 	var font := _font_bold if bold else _font_regular

@@ -41,6 +41,20 @@ static func has_gameplay(level_num: int, step: int) -> bool:
 	return not get_gameplay_step(level_num, step).is_empty()
 
 
+## รายการสไลด์สาธิตคำสั่งสำหรับหน้าต่าง Command Summary & Demonstration Modal
+static func get_demonstration_slides(level_num: int, step: int = 1) -> Array:
+	var data := load_data(level_num)
+	if data.has("demonstration"):
+		var demo = data["demonstration"]
+		if demo is Array:
+			return demo
+		elif demo is Dictionary and demo.has(step):
+			var step_demo = demo[step]
+			if step_demo is Array:
+				return step_demo
+	return []
+
+
 ## ชื่อคำสั่งหลักของด่าน สำหรับแสดงบนการ์ดเลือกด่านและหน้าสรุปผล
 static func get_display_command(level_num: int, data: Dictionary = {}) -> String:
 	if data.is_empty():

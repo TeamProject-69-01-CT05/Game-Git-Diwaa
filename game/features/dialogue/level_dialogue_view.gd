@@ -20,6 +20,7 @@ const LEVEL_SELECT_PATH := "res://features/level_select/level_select_view.tscn"
 ## หน้า Sandbox ที่ใช้เป็นขั้นเล่นจริงของด่าน (แสดงแผงภารกิจตามขั้นที่ตั้งไว้ใน GameProgressManager)
 const SANDBOX_SCENE_PATH := "res://features/sandbox/sandbox_game_view.tscn"
 const LEVEL_CLEAR_SCENE_PATH := "res://features/cutscene/level_clear_scene.tscn"
+const COMMAND_SUMMARY_MODAL_PATH := "res://features/dialogue/command_summary_modal.tscn"
 
 # Animation & Visuals
 @onready var anim_player: AnimationPlayer = $AnimationPlayer
@@ -212,6 +213,7 @@ func _ready() -> void:
 	SceneLoader.request_preload(LEVEL_SELECT_PATH)
 	SceneLoader.request_preload(LEVEL_CLEAR_SCENE_PATH)
 	SceneLoader.request_preload(SANDBOX_SCENE_PATH)
+	SceneLoader.request_preload(COMMAND_SUMMARY_MODAL_PATH)
 	
 	# ตรวจสอบด่านที่เลือกจาก Level Select
 	var selected_lvl := GameProgressManager.get_selected_level_number()
@@ -1514,7 +1516,7 @@ func _on_choice_selected(index: int) -> void:
 # GAMEPLAY STEP & STAGE FINISH
 # ==============================================================================
 
-## ผู้เล่นกด "ฉันจะลองดู" -> ดำเนินบทสนทนาเข้าสู่ช่วงถัดไปในซีนเดิมทันที (ไม่เข้า Sandbox)
+## ผู้เล่นกด "ฉันจะลองดู" -> เปิดหน้าต่างสรุปคำสั่งก่อนเข้าสู่ Sandbox หรือดำเนินบทสนทนาเข้าสู่ช่วงถัดไป
 func _open_gameplay_step(step: int) -> void:
 	if is_transitioning:
 		return
@@ -1530,7 +1532,8 @@ func _open_gameplay_step(step: int) -> void:
 	_hide_continue_arrow()
 	_hide_question_mark()
 
-	if LevelDataLoader.has_gameplay(level_number, step) and _go_to_gameplay_scene(step):
+	if LevelDataLoader.has_gameplay(level_number, step):
+		_show_command_summary_modal(step)
 		return
 
 	# เริ่มช่วงใหม่โดยไม่มีประวัติ: ไม่ให้ปุ่มย้อนกลับพากลับไปที่รายการ open_gameplay แล้ววนกลับมาที่เดิม
@@ -1539,6 +1542,45 @@ func _open_gameplay_step(step: int) -> void:
 	queue_index = 0
 	
 	_begin_dialogue_phase(1 if step == 1 else 2)
+
+
+## แสดงหน้าต่างสรุปคำสั่งและสาธิตการร่ายมนตร์ Git ก่อนนำผู้เล่นเข้าสู่หน้าพิมพ์คำสั่ง (Sandbox)
+func _show_command_summary_modal(step: int) -> void:
+	if not ResourceLoader.exists(COMMAND_SUMMARY_MODAL_PATH):
+		_go_to_gameplay_scene(step)
+		return
+	
+	is_dialogue_active = false
+	_hide_continue_arrow()
+	_hide_question_mark()
+	if is_instance_valid(dialogue_box):
+		dialogue_box.visible = false
+	if is_instance_valid(nav_arrows_container):
+		nav_arrows_container.visible = false
+	if is_instance_valid(skip_ctrl):
+		skip_ctrl.visible = false
+	
+	var modal_scene = load(COMMAND_SUMMARY_MODAL_PATH) as PackedScene
+	if modal_scene == null:
+		_go_to_gameplay_scene(step)
+		return
+	
+	var modal = modal_scene.instantiate()
+	modal.level_number = level_number
+	modal.current_step = step
+	
+	modal.proceed_to_terminal.connect(func(target_step: int) -> void:
+		_go_to_gameplay_scene(target_step)
+	)
+	modal.modal_closed.connect(func() -> void:
+		_go_to_gameplay_scene(step)
+	)
+	
+	var ui_parent = get_node_or_null("MagicStoryUI")
+	if ui_parent != null:
+		ui_parent.add_child(modal)
+	else:
+		add_child(modal)
 
 ## ด่านที่มีนิยามขั้นเล่นจริง -> เฟดดำแล้วไป Sandbox พร้อมแผงภารกิจ คืน false ถ้าเปลี่ยนฉากไม่ได้ (ใช้ทางสำรองข้ามช่วงเล่น)
 func _go_to_gameplay_scene(step: int) -> bool:

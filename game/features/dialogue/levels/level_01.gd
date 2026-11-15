@@ -162,6 +162,36 @@ static func get_data() -> Dictionary:
 		],
 		
 		# ======================================================================
+		# ข้อมูลการสาธิตคำสั่ง (Command Demonstration): แสดงก่อนเข้าสู่เทอร์มินัล
+		# สอดคล้องกับคาถาจริงของด่านที่ 1 (git --version และ git config)
+		# ======================================================================
+		"demonstration": {
+			1: [
+				{
+					"title": "📖 คัมภีร์บันทึกมนตรา: ตรวจสอบระดับพลังเวท",
+					"badge": "✦ คาถาบทที่ 1: ตรวจสอบระดับพลังเวท (git version / git --version)",
+					"guide_text": "ก่อนจะเริ่มร่ายเวทมนตร์ใดๆ นักเวทจำเป็นต้องตรวจสอบเสียก่อนว่า [b]พลังแห่ง Git[/b] ถูกติดตั้งและพร้อมตอบสนองต่อเจ้าหรือไม่\n\nในระบบ Git เจ้าสามารถเลือกพิมพ์คำสั่งนี้ได้ [b][color=#52e0ac]2 รูปแบบ[/color][/b] ซึ่งให้ผลลัพธ์เหมือนกันทุกประการ:\n\n1. [b][color=#73BFF2]git version[/color][/b] — แบบไม่มีขีดเลย พิมพ์ง่ายและสะดวกที่สุด\n2. [b][color=#73BFF2]git --version[/color][/b] — แบบมาตรฐานสากล (ต้องใช้ขีดคู่ [b]--[/b])\n\n[b]⚠️ ข้อควรระวัง:[/b]\n• หากเลือกใช้แบบมีขีด ต้องเป็น [b]ขีดคู่ --version[/b] เท่านั้น ห้ามใช้ขีดเดียว [color=#FF6666]-version[/color]\n• ต้องเว้นวรรคระหว่าง [b]git[/b] กับ [b]version[/b] เสมอ",
+					"command": "git version",
+					"alt_command": "git --version",
+					"button_icon": "✨",
+					"outcome_text": "[color=#52e0ac]✓ สัมผัสพลังเวทสำเร็จ:[/color] Git Version 2.40.1 พร้อมใช้งานในหอคอย",
+					"mode": 0
+				}
+			],
+			2: [
+				{
+					"title": "📖 คัมภีร์บันทึกมนตรา: ประกาศนามและผูกตราประทับ",
+					"badge": "✦ คาถาบทที่ 2: ลงทะเบียนตัวตนของนักเวท",
+					"guide_text": "ทุกครั้งที่นายจารึกการเปลี่ยนแปลงลงในคัมภีร์เวท สำนักเวทต้องรู้ก่อนว่าเจ้าของการจารึกคือใคร เจ้าต้องประกาศตัวตนด้วยคาถา 2 บทนี้:\n\n1. [b]ประกาศนามนักเวท:[/b]\n   [color=#73BFF2]`git config --global user.name \"Vel\"`[/color]\n\n2. [b]ผูกตราประทับวิญญาณ:[/b]\n   [color=#73BFF2]`git config --global user.email \"vel@magic-tower.local\"`[/color]\n\n[b]⚠️ ข้อควรระวัง:[/b] อักขระ [b]--global[/b] ต้องเป็นขีดคู่ และต้องใส่เครื่องหมายคำพูดรอบชื่อและอีเมลให้ครบถ้วน",
+					"command": "ทดสอบประทับตราวิญญาณ",
+					"button_icon": "🔮",
+					"outcome_text": "[color=#FFE680]ตราประทับวิญญาณพร้อมแล้ว![/color] หอคอยพร้อมจดจำตัวตนของเจ้า\nเข้าสู่เทอร์มินัลเพื่อร่ายคาถาประกาศนามและผูกตราประทับจริง",
+					"mode": 1 # CONFIG_REGISTRY
+				}
+			]
+		},
+
+		# ======================================================================
 		# ขั้นเล่นจริง (Sandbox + แผงภารกิจ): เปิดจาก {"type": "open_gameplay", "step": N}
 		# objective.text = ข้อความเต็ม (แสดงในช่องพิมพ์เทอร์มินัล) / short = ชื่อสั้นในเช็กลิสต์ของแผงภารกิจ (ไม่ใส่ = ใช้ text)
 		# ตรวจคำสั่งด้วย LevelMission (ดูชนิด objective ที่ features/level_mission/level_mission.gd)
@@ -173,10 +203,10 @@ static func get_data() -> Dictionary:
 				"objectives": [
 					{
 						"id": "version",
-						"text": "ร่ายคาถา git --version",
+						"text": "ร่ายคาถา git version หรือ git --version",
 						"type": "command",
 						"commands": ["git --version", "git version"],
-						"hint": "พิมพ์ git เว้นวรรค แล้วตามด้วยขีดคู่ติดกับคำว่า version (--version)",
+						"hint": "พิมพ์ได้ทั้ง 2 แบบ: git version หรือ git --version ในเทอร์มินัล",
 						"near_miss": [
 							{"pattern": "^git\\s+-version", "message": "ขีดหน้า version ต้องเป็นขีดคู่ --version"},
 							{"pattern": "^git--", "message": "ต้องเว้นวรรคระหว่าง git กับ --version"},
